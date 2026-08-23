@@ -10,9 +10,19 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 BACKEND_ROOT = SCRIPT_DIR.parent
 WORKSPACE_ROOT = BACKEND_ROOT.parent
 
+import types
+
 for p in [str(WORKSPACE_ROOT), str(BACKEND_ROOT)]:
     if p not in sys.path:
         sys.path.insert(0, p)
+
+if "backend" not in sys.modules:
+    _backend_mod = types.ModuleType("backend")
+    _backend_mod.__path__ = [str(BACKEND_ROOT)]
+    sys.modules["backend"] = _backend_mod
+    import app
+    _backend_mod.app = app
+    sys.modules["backend.app"] = app
 
 from backend.app.config import settings
 from backend.app.core.logging import logger
