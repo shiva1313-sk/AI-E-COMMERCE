@@ -1,21 +1,27 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 class ApiService {
-  async _request(endpoint, options = {}) {
+  async _request(endpoint, options = {}, timeoutMs = 4000) {
     const url = `${API_BASE_URL}${endpoint}`;
     const defaultHeaders = {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     };
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
     try {
       const response = await fetch(url, {
         ...options,
+        signal: controller.signal,
         headers: {
           ...defaultHeaders,
           ...options.headers
         }
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         let errorData;
@@ -29,13 +35,18 @@ class ApiService {
 
       return await response.json();
     } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        console.warn(`Request to ${endpoint} timed out after ${timeoutMs}ms`);
+        throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+      }
       console.error(`API error on ${endpoint}:`, error);
       throw error;
     }
   }
 
   async checkHealth() {
-    return this._request('/api/health');
+    return this._request('/api/health', {}, 3000);
   }
 
   async sendChatMessage(message, conversationId = null, orders = []) {
@@ -46,7 +57,7 @@ class ApiService {
         conversation_id: conversationId,
         orders: orders || []
       })
-    });
+    }, 5000);
   }
 
   async getRecommendations(query, category = null, maxPrice = null, topK = 4) {
@@ -58,7 +69,7 @@ class ApiService {
         max_price: maxPrice,
         top_k: topK
       })
-    });
+    }, 4000);
   }
 
   async queryKnowledge(query, topK = 3) {
@@ -68,7 +79,7 @@ class ApiService {
         query,
         top_k: topK
       })
-    });
+    }, 4000);
   }
 
   async getProducts(filters = {}) {
@@ -80,11 +91,11 @@ class ApiService {
     if (filters.search) params.append('search', filters.search);
 
     const queryStr = params.toString() ? `?${params.toString()}` : '';
-    return this._request(`/api/products${queryStr}`);
+    return this._request(`/api/products${queryStr}`, {}, 3500);
   }
 
   async getProductById(productId) {
-    return this._request(`/api/products/${productId}`);
+    return this._request(`/api/products/${productId}`, {}, 3500);
   }
 }
 

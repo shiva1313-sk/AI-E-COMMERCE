@@ -13,6 +13,88 @@ import { useCart, CartProvider } from './context/CartContext';
 import { api } from './services/api';
 import defaultProducts from './data/products.json';
 
+// Category mapping helper for instant client-side search
+const CATEGORY_KEYWORDS = {
+  'phone': 'Smartphones',
+  'phones': 'Smartphones',
+  'smartphone': 'Smartphones',
+  'smartphones': 'Smartphones',
+  'mobile': 'Smartphones',
+  'mobiles': 'Smartphones',
+  'laptop': 'Laptops',
+  'laptops': 'Laptops',
+  'computer': 'Laptops',
+  'headphone': 'Headphones',
+  'headphones': 'Headphones',
+  'earphone': 'Headphones',
+  'earbuds': 'Headphones',
+  'shoe': 'Running Shoes',
+  'shoes': 'Running Shoes',
+  'sneaker': 'Running Shoes',
+  'backpack': 'Backpacks',
+  'backpacks': 'Backpacks',
+  'bag': 'Backpacks',
+  'watch': 'Smart Watches',
+  'watches': 'Smart Watches',
+  'smartwatch': 'Smart Watches',
+  'keyboard': 'Keyboards',
+  'keyboards': 'Keyboards',
+  'mouse': 'Mouse',
+  'desk': 'Office Accessories',
+  'office': 'Office Accessories',
+  'student': 'College Accessories',
+  'college': 'College Accessories'
+};
+
+function filterLocalCatalog(catalog, query, category) {
+  let list = [...catalog];
+
+  // 1. Category filter
+  if (category) {
+    list = list.filter(p => p.category.toLowerCase() === category.toLowerCase());
+  }
+
+  // 2. Query search
+  if (query && query.trim()) {
+    const cleanQ = query.toLowerCase().trim();
+
+    // Extract price if any
+    let maxPrice = null;
+    const priceMatch = cleanQ.match(/(?:under|below|less than|upto|budget of)\s*(?:rs\.?|inr|₹)?\s*(\d+)(k)?/i);
+    if (priceMatch) {
+      maxPrice = parseInt(priceMatch[1], 10) * (priceMatch[2] ? 1000 : 1);
+    }
+
+    // Extract category from query words
+    let matchedCategory = null;
+    for (const [kw, cat] of Object.entries(CATEGORY_KEYWORDS)) {
+      if (new RegExp(`\\b${kw}\\b`, 'i').test(cleanQ)) {
+        matchedCategory = cat;
+        break;
+      }
+    }
+
+    list = list.filter(p => {
+      // Budget check
+      if (maxPrice && p.price > maxPrice) return false;
+
+      // If category matched from keyword, prioritize it
+      if (matchedCategory && p.category.toLowerCase() === matchedCategory.toLowerCase()) {
+        return true;
+      }
+
+      // Keyword text matching
+      const pText = `${p.name} ${p.brand} ${p.category} ${p.description} ${(p.features || []).join(' ')}`.toLowerCase();
+      const words = cleanQ.split(/\s+/).filter(w => w.length > 2 && !['under', 'below', 'show', 'suggest', 'with', 'for', 'the'].includes(w));
+      
+      if (words.length === 0) return true;
+      return words.some(w => pText.includes(w));
+    });
+  }
+
+  return list;
+}
+
 function MainAppContent() {
   const {
     messages,
@@ -33,60 +115,52 @@ function MainAppContent() {
   } = useCart();
 
   // Local state for catalog browsing & filtering
-  const [products, setProducts] = useState(defaultProducts || []);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState(null);
   const [sortBy, setSortBy] = useState('popular'); // 'popular' | 'price_low' | 'price_high' | 'rating'
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [backendProducts, setBackendProducts] = useState(null);
 
-  // Fetch products from backend hybrid search when search query or category changes
-  const loadProducts = useCallback(async (query = searchQuery, category = activeCategory) => {
-    setIsLoadingProducts(true);
-    try {
-      const filters = {};
-      if (category) filters.category = category;
-      if (query && query.trim()) filters.search = query.trim();
-
-      const res = await api.getProducts(filters);
-      if (res && res.data) {
-        setProducts(res.data);
-      }
-    } catch (err) {
-      console.warn('Backend search unavailable, applying client-side fallback:', err);
-      let fallback = [...defaultProducts];
-      if (category) {
-        fallback = fallback.filter(p => p.category.toLowerCase() === category.toLowerCase());
-      }
-      if (query && query.trim()) {
-        const q = query.toLowerCase().trim();
-        fallback = fallback.filter(p =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.brand.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
-          (p.features && p.features.some(f => f.toLowerCase().includes(q)))
-        );
-      }
-      setProducts(fallback);
-    } finally {
-      setIsLoadingProducts(false);
+  // Computed instant products (0ms latency, always populated)
+  const products = useMemo(() => {
+    if (backendProducts && backendProducts.length > 0) {
+      return backendProducts;
     }
-  }, [searchQuery, activeCategory]);
+    return filterLocalCatalog(defaultProducts, searchQuery, activeCategory);
+  }, [backendProducts, searchQuery, activeCategory]);
 
-  // Initial load & category changes
+  // Background sync with backend
   useEffect(() => {
-    loadProducts(searchQuery, activeCategory);
-  }, [searchQuery, activeCategory, loadProducts]);
+    let isMounted = true;
+
+    async function syncBackend() {
+      try {
+        const filters = {};
+        if (activeCategory) filters.category = activeCategory;
+        if (searchQuery && searchQuery.trim()) filters.search = searchQuery.trim();
+
+        const res = await api.getProducts(filters);
+        if (isMounted && res && res.data) {
+          setBackendProducts(res.data);
+        }
+      } catch (err) {
+        // Fallback already rendered seamlessly via useMemo
+        if (isMounted) setBackendProducts(null);
+      }
+    }
+
+    // Reset backend cache on query change so instant local filter renders immediately
+    setBackendProducts(null);
+    syncBackend();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [searchQuery, activeCategory]);
 
   // Handle header AI search submit
   const handleHeaderSearch = (query) => {
     setSearchQuery(query);
-    loadProducts(query, activeCategory);
-    if (query && query.trim()) {
-      // Also send to AI chatbot session with real user orders context
-      sendMessage(query.trim(), orders);
-    }
   };
 
   // Category navigation click
@@ -160,12 +234,7 @@ function MainAppContent() {
           </div>
         </div>
 
-        {isLoadingProducts ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
-            <div style={{ fontSize: '2rem', marginBottom: '10px' }}>⏳</div>
-            Searching products with AI hybrid ranking...
-          </div>
-        ) : sortedProducts.length === 0 ? (
+        {sortedProducts.length === 0 ? (
           <div className="empty-cart-view">
             <div className="empty-cart-icon">🔍</div>
             <h3>No products found matching your requirements.</h3>

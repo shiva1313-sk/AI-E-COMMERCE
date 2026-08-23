@@ -46,30 +46,14 @@ from backend.app.api.chat import router as chat_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan: initialize services, load indexes, check Ollama."""
+    """Application lifespan: initialize services and load indexes."""
     logger.info("Initializing AI Shopping Assistant application...")
     
     # 1. Verify product dataset
     logger.info(f"Loaded {len(product_service.products)} products into memory.")
 
     # 2. Load FAISS indices
-    logger.info("Loading FAISS vector store indices...")
     vector_store_service.load_all_indices()
-
-    # If vector store is missing, trigger automatic ingestion
-    if not vector_store_service.is_index_ready("products") or not vector_store_service.is_index_ready("knowledge"):
-        logger.warning("FAISS indices not found on disk. Triggering auto-ingestion...")
-        try:
-            from backend.scripts.ingest import run_ingestion
-            run_ingestion()
-            vector_store_service.load_all_indices()
-        except Exception as e:
-            logger.error(f"Auto-ingestion failed: {e}")
-
-    # 3. Check Ollama LLM health
-    logger.info("Checking Ollama LLM connectivity...")
-    ollama_status = await ollama_service.check_health()
-    logger.info(f"Ollama health check result: {ollama_status}")
 
     yield
 
