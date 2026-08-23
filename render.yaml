@@ -19,8 +19,6 @@ services:
     name: ai-ecommerce-frontend
     runtime: static
     rootDir: frontend
-    plan: free
-    region: singapore
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     routes:
