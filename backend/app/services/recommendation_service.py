@@ -6,13 +6,13 @@ from backend.app.models.product import Product
 from backend.app.models.recommendation import RecommendationItem, RecommendationResult
 from backend.app.services.product_service import product_service
 from backend.app.services.query_parser import query_parser
-from backend.app.services.ollama_service import ollama_service
+from backend.app.services.llm_service import llm_service
 from backend.app.prompts.recommendation_prompt import build_recommendation_prompt
 from backend.app.prompts.system_prompt import SYSTEM_PROMPT
 
 
 class RecommendationService:
-    """Hybrid recommendation service combining query parsing, deterministic constraints, semantic ranking, and grounded generation."""
+    """Hybrid recommendation service combining query parsing, deterministic constraints, semantic ranking, and instant grounded generation."""
 
     async def recommend(
         self,
@@ -28,7 +28,7 @@ class RecommendationService:
         Execute grounded recommendation pipeline:
         1. Extract constraints and perform hybrid search.
         2. If 0 matching products, return 'No products found matching your requirements.'
-        3. Formulate short grounded reasons and 1-3 sentence summary message.
+        3. Formulate short grounded reasons and 1-3 sentence summary message in sub-millisecond time.
         """
         logger.info(f"Processing recommendation for query: '{query}'")
 
@@ -82,8 +82,16 @@ class RecommendationService:
                 )
             )
 
-        # 5. Generate concise 1-3 sentence intro message
-        ai_message = ""
+        # 5. Generate concise 1-3 sentence intro message with fast synthesis
+        if settings.FAST_SYNTHESIS_MODE and not (settings.GEMINI_API_KEY or settings.GROQ_API_KEY):
+            ai_message = llm_service.synthesize_fast_recommendation(
+                query=query,
+                products=candidate_products,
+                parsed_query=parsed
+            )
+            return items, ai_message
+
+        # If Cloud API or external LLM is configured, attempt fast generation
         candidate_text_chunks = []
         for p in candidate_products:
             chunk = (
@@ -100,21 +108,25 @@ class RecommendationService:
         )
 
         try:
-            raw_msg = await ollama_service.generate(
+            raw_msg = await llm_service.generate_response(
                 prompt=prompt,
                 system=SYSTEM_PROMPT,
-                temperature=0.2
+                temperature=0.2,
+                max_tokens=150
             )
-            sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', raw_msg.strip()) if s.strip()]
-            ai_message = " ".join(sentences[:3]) if len(sentences) > 3 else raw_msg.strip()
-        except Exception:
-            # Deterministic concise fallback
-            if len(candidate_products) == 1:
-                ai_message = f"I recommend the {candidate_products[0].name} (₹{candidate_products[0].price:,}), which best matches your criteria."
-            else:
-                top_names = ", ".join([f"{p.name} (₹{p.price:,})" for p in candidate_products[:2]])
-                ai_message = f"Based on your requirements, here are our top recommendations: {top_names}."
+            if raw_msg:
+                sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', raw_msg.strip()) if s.strip()]
+                ai_message = " ".join(sentences[:3]) if len(sentences) > 3 else raw_msg.strip()
+                return items, ai_message
+        except Exception as e:
+            logger.warning(f"External recommendation LLM generation bypassed: {e}")
 
+        # Deterministic fast synthesis fallback
+        ai_message = llm_service.synthesize_fast_recommendation(
+            query=query,
+            products=candidate_products,
+            parsed_query=parsed
+        )
         return items, ai_message
 
     def _build_grounded_reason(self, product: Product, parsed) -> str:

@@ -103,18 +103,17 @@ app.add_middleware(
 @app.get("/api/health", tags=["Health"])
 async def health_check():
     """
-    Health check endpoint returning system status, vector store readiness, and Ollama availability.
+    Health check endpoint returning system status, vector store readiness, and AI assistant availability.
     """
     ollama_health = await ollama_service.check_health()
     vector_ready = vector_store_service.is_index_ready("products") and vector_store_service.is_index_ready("knowledge")
     
     status_str = "healthy" if vector_ready else "degraded"
-    if not ollama_health.get("server_online", False):
-        status_str = "degraded (ollama offline)"
 
     return {
         "status": status_str,
         "environment": settings.ENVIRONMENT,
+        "fast_synthesis": "active" if settings.FAST_SYNTHESIS_MODE else "disabled",
         "ollama": ollama_health.get("status", "unknown"),
         "model": settings.OLLAMA_MODEL,
         "ollama_details": ollama_health,

@@ -25,10 +25,13 @@ class Settings(BaseSettings):
         "http://localhost:8000"
     ]
 
-    # LLM Settings
+    # LLM & Fast Synthesis Settings
+    FAST_SYNTHESIS_MODE: bool = True
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     OLLAMA_MODEL: str = "gemma3:4b"
-    OLLAMA_TIMEOUT_SECONDS: int = 45
+    OLLAMA_TIMEOUT_SECONDS: float = 2.5
+    GEMINI_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
 
     # Embedding & Vector Store Settings
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"

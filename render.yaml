@@ -14,6 +14,10 @@ services:
         value: 3.11.9
       - key: CORS_ORIGINS
         value: "*"
+      - key: FAST_SYNTHESIS_MODE
+        value: "true"
+      - key: OLLAMA_TIMEOUT_SECONDS
+        value: "3"
 
   # Frontend (React + Vite)
   - type: web

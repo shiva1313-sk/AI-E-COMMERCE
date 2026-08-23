@@ -4,7 +4,7 @@ from backend.app.config import settings
 from backend.app.core.logging import logger
 from backend.app.schemas.chat import SourceDocument
 from backend.app.services.vector_store_service import vector_store_service
-from backend.app.services.ollama_service import ollama_service
+from backend.app.services.llm_service import llm_service
 from backend.app.prompts.support_prompt import build_support_prompt
 from backend.app.prompts.system_prompt import SYSTEM_PROMPT
 
@@ -25,8 +25,7 @@ class RAGService:
         1. Embed user query & search FAISS knowledge index.
         2. Apply strict similarity threshold filter.
         3. Check topic relevance to ensure no hallucination on missing policies.
-        4. Synthesize short (1-3 sentences) answer with Ollama using retrieved chunks.
-        5. If Ollama is unavailable -> generate direct grounded summary from top snippet.
+        4. Synthesize short (1-3 sentences) grounded answer with sub-millisecond fast synthesis or LLM.
         """
         logger.info(f"Executing support RAG search for query: '{query}'")
 
@@ -65,7 +64,6 @@ class RAGService:
         all_text_lower = " ".join(combined_texts).lower()
 
         # 3. Guardrail: verify that specific substantive query concepts actually exist in the retrieved text
-        # (prevents false matches when generic terms like 'delivery' match but specific modifiers like 'international delivery' are absent)
         unsupported_policy_patterns = [
             r'\binternational(?:\s+delivery|\s+shipping|\s+order|\s+courier)?\b',
             r'\boutside\s+india\b',
@@ -83,46 +81,46 @@ class RAGService:
                     logger.info("International delivery/shipping is not supported in KB documents.")
                     return self.FALLBACK_MESSAGE, [], False
 
-        # 4. Prompt Construction
+        # 4. Instant Fast Synthesis & LLM Fallback Pipeline
+        top_doc = search_results[0][0]
+
+        # Check if fast synthesis mode is active
+        if settings.FAST_SYNTHESIS_MODE and not (settings.GEMINI_API_KEY or settings.GROQ_API_KEY):
+            fast_answer = llm_service.synthesize_fast_support_answer(
+                query=query,
+                top_doc=top_doc,
+                search_results=search_results
+            )
+            return fast_answer, sources, True
+
+        # Otherwise attempt prompt generation with fast non-blocking fallback
         prompt = build_support_prompt(
             query=query,
             policy_context=combined_context,
             conversation_history=conversation_history
         )
 
-        # 5. LLM Generation via Ollama
         try:
-            raw_answer = await ollama_service.generate(
+            llm_text = await llm_service.generate_response(
                 prompt=prompt,
                 system=SYSTEM_PROMPT,
-                temperature=0.1
+                temperature=0.1,
+                max_tokens=150
             )
-            sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', raw_answer.strip()) if s.strip()]
-            if len(sentences) > 3:
-                answer = " ".join(sentences[:3])
-            else:
-                answer = raw_answer.strip()
-            return answer, sources, True
+            if llm_text:
+                sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', llm_text.strip()) if s.strip()]
+                answer = " ".join(sentences[:3]) if len(sentences) > 3 else llm_text.strip()
+                return answer, sources, True
         except Exception as e:
-            logger.warning(f"Ollama generation unavailable ({e}). Generating direct grounded answer from knowledge base snippets.")
-            # Deterministic fallback: extract relevant lines containing query keywords from top chunk
-            top_doc = search_results[0][0]
-            top_content = top_doc.get("content", "").strip()
-            lines = [l.strip().lstrip("-*# ") for l in top_content.split("\n") if l.strip() and not l.startswith("#")]
-            
-            query_words = [w.lower() for w in re.findall(r'\b[a-zA-Z]{3,}\b', query)]
-            # Find lines that match query words
-            matching_lines = []
-            for line in lines:
-                if any(qw in line.lower() for qw in query_words if qw not in {"delivery", "return", "warranty", "refund", "order", "what", "how", "can", "the"}):
-                    matching_lines.append(line)
-            
-            if not matching_lines:
-                matching_lines = lines[:2]
+            logger.warning(f"External LLM generation bypassed: {e}")
 
-            snippet_summary = " ".join(matching_lines[:2])
-            fallback_answer = f"According to our {top_doc.get('document', 'policy')}, {snippet_summary}"
-            return fallback_answer, sources, True
+        # Deterministic grounded fallback in <1ms
+        fast_answer = llm_service.synthesize_fast_support_answer(
+            query=query,
+            top_doc=top_doc,
+            search_results=search_results
+        )
+        return fast_answer, sources, True
 
 
 rag_service = RAGService()

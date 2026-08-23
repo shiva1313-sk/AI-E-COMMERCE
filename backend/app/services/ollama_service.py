@@ -1,3 +1,4 @@
+import time
 from typing import Any, Dict, List, Optional
 import httpx
 from backend.app.config import settings
@@ -6,53 +7,68 @@ from backend.app.core.exceptions import OllamaServiceException
 
 
 class OllamaService:
-    """Service to communicate with local or remote Ollama LLM instance."""
+    """Service to communicate with local or remote Ollama LLM instance with fast circuit breaking and caching."""
 
     def __init__(self):
         self.base_url = settings.OLLAMA_BASE_URL.rstrip("/")
         self.model = settings.OLLAMA_MODEL
-        self.timeout = settings.OLLAMA_TIMEOUT_SECONDS
+        self._last_health_check_time: float = 0.0
+        self._cached_health: Optional[Dict[str, Any]] = None
+        self._health_cache_ttl: float = 45.0  # Cache health check for 45 seconds
 
-    async def check_health(self) -> Dict[str, Any]:
+    @property
+    def timeout(self) -> float:
+        return float(settings.OLLAMA_TIMEOUT_SECONDS)
+
+    async def check_health(self, force: bool = False) -> Dict[str, Any]:
         """
         Check if Ollama server is reachable and verify if the configured model is available.
+        Uses cached result within TTL to eliminate unnecessary latency.
         """
+        now = time.time()
+        if not force and self._cached_health is not None and (now - self._last_health_check_time) < self._health_cache_ttl:
+            return self._cached_health
+
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            # Use quick timeout for health checks (1.5s max)
+            async with httpx.AsyncClient(timeout=1.5) as client:
                 resp = await client.get(f"{self.base_url}/api/tags")
                 if resp.status_code == 200:
                     data = resp.json()
                     models = [m.get("name", "") for m in data.get("models", [])]
-                    # Check if requested model or its base tag exists
                     model_found = any(
                         self.model == m or self.model in m or m.startswith(self.model.split(":")[0])
                         for m in models
                     )
-                    return {
-                        "status": "available",
+                    health_res = {
+                        "status": "available" if model_found else "model_missing",
                         "server_online": True,
                         "configured_model": self.model,
                         "model_installed": model_found,
                         "available_models": models
                     }
                 else:
-                    return {
+                    health_res = {
                         "status": "unavailable",
                         "server_online": False,
                         "error": f"Ollama returned HTTP {resp.status_code}"
                     }
         except httpx.ConnectError:
-            return {
+            health_res = {
                 "status": "offline",
                 "server_online": False,
-                "error": f"Cannot connect to Ollama at {self.base_url}. Ensure Ollama is running ('ollama serve')."
+                "error": f"Cannot connect to Ollama at {self.base_url}."
             }
         except Exception as e:
-            return {
+            health_res = {
                 "status": "error",
                 "server_online": False,
                 "error": str(e)
             }
+
+        self._cached_health = health_res
+        self._last_health_check_time = now
+        return health_res
 
     async def is_available(self) -> bool:
         """Quick boolean check for Ollama availability."""
@@ -64,11 +80,15 @@ class OllamaService:
         prompt: str,
         system: Optional[str] = None,
         temperature: float = 0.2,
-        max_tokens: int = 800
+        max_tokens: int = 150
     ) -> str:
         """
-        Generate text response from configured Ollama model.
+        Generate text response from configured Ollama model with fast circuit breaking.
         """
+        # Fast circuit breaker: if we know Ollama is offline, fail instantly without waiting
+        if not await self.is_available():
+            raise OllamaServiceException("Ollama service is offline or model not installed.")
+
         payload = {
             "model": self.model,
             "prompt": prompt,
@@ -82,8 +102,8 @@ class OllamaService:
             payload["system"] = system
 
         try:
-            logger.info(f"Sending generation request to Ollama ({self.model})...")
-            async with httpx.AsyncClient(timeout=float(self.timeout)) as client:
+            logger.info(f"Sending fast generation request to Ollama ({self.model})...")
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
                     f"{self.base_url}/api/generate",
                     json=payload
@@ -92,10 +112,10 @@ class OllamaService:
                 if response.status_code == 200:
                     result = response.json()
                     generated_text = result.get("response", "").strip()
-                    logger.info(f"Ollama successfully returned {len(generated_text)} characters.")
+                    logger.info(f"Ollama returned {len(generated_text)} chars.")
                     return generated_text
                 elif response.status_code == 404:
-                    msg = f"Model '{self.model}' not found in Ollama. Please run: 'ollama pull {self.model}'"
+                    msg = f"Model '{self.model}' not found in Ollama."
                     logger.error(msg)
                     raise OllamaServiceException(msg, details={"model": self.model})
                 else:
@@ -104,19 +124,15 @@ class OllamaService:
                     raise OllamaServiceException(msg)
 
         except httpx.ConnectError:
-            msg = f"Ollama server is not reachable at {self.base_url}. Please ensure Ollama is running ('ollama serve')."
-            logger.warning(msg)
-            raise OllamaServiceException(msg)
+            self._cached_health = {"status": "offline", "server_online": False}
+            self._last_health_check_time = time.time()
+            raise OllamaServiceException(f"Ollama server is not reachable at {self.base_url}.")
         except httpx.TimeoutException:
-            msg = f"Ollama request timed out after {self.timeout} seconds."
-            logger.error(msg)
-            raise OllamaServiceException(msg)
+            raise OllamaServiceException(f"Ollama request timed out after {self.timeout} seconds.")
         except OllamaServiceException:
             raise
         except Exception as e:
-            msg = f"Unexpected error during Ollama generation: {str(e)}"
-            logger.exception(msg)
-            raise OllamaServiceException(msg)
+            raise OllamaServiceException(f"Unexpected error during Ollama generation: {str(e)}")
 
 
 ollama_service = OllamaService()
