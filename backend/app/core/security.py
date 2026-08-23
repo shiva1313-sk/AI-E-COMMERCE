@@ -19,4 +19,5 @@ def get_cors_origins() -> List[str]:
     """Return validated CORS origins list."""
     if isinstance(settings.CORS_ORIGINS, list):
         return settings.CORS_ORIGINS
-    return ["http://localhost:5173", "http://localhost:3000"]
+    return ["*"]
+
