@@ -1,0 +1,44 @@
+a_c_data=["1234 5678 9012","3456 7890 1234","5678 9012 3456"]
+print("welcome to atm")
+ac_no=str(input("enter your a/c no: " ))
+data={"1234 5678 9012":{"pin":1234,"user":"xyz","balance":10000.00}
+   ,"3456 7890 1234":{"pin":3456,"user":"mno","balance":15000.00}
+   ,"5678 9012 3456":{"pin":5678,"user":"abc","balance":5000.00}}
+
+if ac_no in a_c_data:
+    pin=int(input("enter your pin: "))
+    if pin ==data[ac_no]["pin"]:
+        print("welcome customer",data[ac_no]["user"])
+        balance=data[ac_no]["balance"]
+        x="mini-statement"
+        y="deposit"
+        z="withdrawl"
+        user_choice=str(input("select from mini-statement |deposit |withdrawl : "))
+        if user_choice==x:
+            print("welcome to mini-statement")
+            print("your balace amount is ",balance)
+        elif user_choice==y:
+            print("welcome to deposit space")
+            deposit=float(input("enter amount to deposit: "))
+            balance+=deposit
+            print("your balace amount is ",balance)
+        elif user_choice==z:
+            print("welcome to withdrawl space")
+            withdraw=float(input("enter withdraw amount:"))
+            if balance>=withdraw:
+                balance-=withdraw
+                print("please collect cash of ",withdraw)
+                print("your balace amount is ",balance)
+
+            else:
+                print("sorry insufficient funds")
+                print("your balace amount is ",balance)
+
+
+        else:
+            print("please select from mini-statement |deposit |withdrawl ")
+    else:
+        print("please enter valid  pin")
+
+else:
+    print("please enter valid ac no")

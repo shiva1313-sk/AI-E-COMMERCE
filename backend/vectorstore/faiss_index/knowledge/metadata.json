@@ -1,0 +1,202 @@
+[
+  {
+    "source_type": "policy",
+    "source_file": "cancellation.md",
+    "document": "Cancellation",
+    "title": "Cancellation - Order Cancellation Policy",
+    "chunk_index": 0,
+    "content": "# Order Cancellation Policy"
+  },
+  {
+    "source_type": "policy",
+    "source_file": "cancellation.md",
+    "document": "Cancellation",
+    "title": "Cancellation - 1. Cancellation Before Dispatch",
+    "chunk_index": 1,
+    "content": "## 1. Cancellation Before Dispatch\n- Customers can cancel an order free of charge at any time before it has been dispatched from our fulfillment warehouse.\n- To cancel an order before dispatch:\n  1. Go to **My Orders**.\n  2. Select the relevant order.\n  3. Click **Cancel Order** and select a cancellation reason.\n- For prepaid orders cancelled prior to dispatch, the full refund is initiated automatically within **2 hours**, and funds are credited back to the original payment source within **24 to 48 hours** for UPI/Wallets or **3 to 5 business days** for credit/debit cards."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "cancellation.md",
+    "document": "Cancellation",
+    "title": "Cancellation - 2. Cancellation After Dispatch",
+    "chunk_index": 2,
+    "content": "## 2. Cancellation After Dispatch\n- If the order has already been shipped or is in transit, it cannot be cancelled directly through the website or mobile app.\n- In this case, customers have two options:\n  - **Refuse delivery** when the courier delivery agent attempts doorstep delivery.\n  - **Accept delivery** and initiate a 7-day return through the standard return portal.\n- Once the package is marked as returned to sender (RTO), a full refund will be processed minus any expedited shipping charges."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "cancellation.md",
+    "document": "Cancellation",
+    "title": "Cancellation - 3. Merchant / System Cancellations",
+    "chunk_index": 3,
+    "content": "## 3. Merchant / System Cancellations\nWe reserve the right to cancel an order under the following exceptional circumstances:\n- The ordered product is unexpectedly out of stock or fails final pre-dispatch quality inspection.\n- The delivery address is incomplete, unserviceable, or falls outside our courier coverage zones.\n- Flagged fraudulent transactions or pricing errors due to system glitches.\n- In such cases, customers will be notified immediately via email and SMS, and a 100% full refund will be issued immediately."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "delivery.md",
+    "document": "Delivery",
+    "title": "Delivery - Delivery and Shipping Information",
+    "chunk_index": 0,
+    "content": "# Delivery and Shipping Information"
+  },
+  {
+    "source_type": "policy",
+    "source_file": "delivery.md",
+    "document": "Delivery",
+    "title": "Delivery - 1. Shipping Options and Timelines",
+    "chunk_index": 1,
+    "content": "## 1. Shipping Options and Timelines\nWe deliver to over 19,000 postal pincodes across India through premier courier partners (BlueDart, Delhivery, DTDC, and India Post).\n\n- **Standard Delivery**: \n  - Estimated delivery within **3 to 5 business days** for metro cities and tier-1 locations.\n  - **4 to 7 business days** for tier-2, tier-3, and remote locations.\n  - Delivery is **FREE** on all orders above ₹999. A flat nominal shipping fee of ₹49 applies to orders under ₹999.\n- **Express / Next-Day Delivery**:\n  - Available in select metropolitan cities (Mumbai, Bengaluru, Delhi NCR, Hyderabad, Chennai, Pune).\n  - Orders placed before 1:00 PM are dispatched on the same day and delivered within **24 to 48 hours**.\n  - Flat fee of ₹99 applies regardless of cart value."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "delivery.md",
+    "document": "Delivery",
+    "title": "Delivery - 2. Order Tracking",
+    "chunk_index": 2,
+    "content": "## 2. Order Tracking\n- Once your order is dispatched from our warehouse, you will receive an automated email and SMS notification containing the Courier Partner Name and AWB Tracking Number.\n- You can track your package in real-time by visiting **My Orders > Track Shipment** or directly on the courier partner's tracking portal."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "delivery.md",
+    "document": "Delivery",
+    "title": "Delivery - 3. Delivery Attempts and Verification",
+    "chunk_index": 3,
+    "content": "## 3. Delivery Attempts and Verification\n- Our delivery executives will make up to **3 delivery attempts** before returning the package to our warehouse.\n- For high-value electronics and smartphones (orders exceeding ₹10,000), a secure **OTP (One-Time Password)** will be sent to your registered mobile number for verification at the time of delivery.\n- Please do not share the OTP until you have physically verified the intact condition of the outer shipping box. If the outer package appears tampered or open, refuse delivery immediately."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "faq.md",
+    "document": "Faq",
+    "title": "Faq - Frequently Asked Questions (FAQs)",
+    "chunk_index": 0,
+    "content": "# Frequently Asked Questions (FAQs)"
+  },
+  {
+    "source_type": "policy",
+    "source_file": "faq.md",
+    "document": "Faq",
+    "title": "Faq - 1. General Ordering & Account Questions",
+    "chunk_index": 1,
+    "content": "## 1. General Ordering & Account Questions\n\n### How do I check my order status?\nYou can check your order status anytime by logging into your account and clicking on **My Orders**. Click on the specific order to view current progress (Processing, Packed, Dispatched, Out for Delivery, Delivered) and live courier tracking.\n\n### Can I modify my shipping address after placing an order?\nYou can edit your delivery address directly from the **My Orders** screen as long as the order has not been dispatched. Once dispatched, addresses cannot be altered in transit due to courier security constraints.\n\n### How do I get an official GST tax invoice?\nEvery shipped order automatically generates a GST-compliant tax invoice. Go to **My Orders > Order Details > Download Invoice (PDF)**."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "faq.md",
+    "document": "Faq",
+    "title": "Faq - 2. Customer Support & Contact Timings",
+    "chunk_index": 2,
+    "content": "## 2. Customer Support & Contact Timings\n\n### How can I reach human customer support?\n- **Email Support**: `support@shopease.com` (24-48 hour response time)\n- **Toll-Free Helpline**: `1800-123-4567` (Available Monday to Saturday, 9:00 AM to 8:00 PM IST)\n- **Live In-App Chat**: Available 24/7 with this AI Assistant, with instant escalation options to human agents during operational business hours.\n\n### Where are your fulfillment centers located?\nOur state-of-the-art warehouses are located in Mumbai, Bengaluru, Delhi NCR, and Kolkata, enabling rapid same-day and next-day delivery across India.\n\n### Are genuine products and warranties guaranteed?\nYes! 100% of products sold on our platform are sourced directly from authorized brand distributors and official brand partners. All items come with brand warranty and authentic manufacturer packaging."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "payment.md",
+    "document": "Payment",
+    "title": "Payment - Payment Information and Methods",
+    "chunk_index": 0,
+    "content": "# Payment Information and Methods"
+  },
+  {
+    "source_type": "policy",
+    "source_file": "payment.md",
+    "document": "Payment",
+    "title": "Payment - 1. Supported Payment Options",
+    "chunk_index": 1,
+    "content": "## 1. Supported Payment Options\nWe provide secure, encrypted 256-bit SSL checkout supporting the following payment methods:\n- **UPI**: Instant payment via Google Pay, PhonePe, Paytm, BHIM, and all bank UPI apps with zero transaction surcharge.\n- **Credit and Debit Cards**: Visa, MasterCard, RuPay, Maestro, and American Express cards issued by all major domestic and international banks.\n- **Net Banking**: Direct bank transfer supported for 50+ banks across India (HDFC, ICICI, SBI, Axis, Kotak, etc.).\n- **EMI & Pay Later**:\n  - No-Cost EMI and Standard Credit Card EMI available on orders above ₹3,000 for tenures of 3, 6, 9, and 12 months.\n  - Debit Card EMI and Cardless EMI available through partner providers.\n- **Cash on Delivery (COD)**:\n  - COD is available on orders between ₹299 and ₹20,000 for serviceable pincodes.\n  - A nominal ₹30 handling charge is applicable for COD orders. Exact cash or QR code scan-on-delivery is accepted."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "payment.md",
+    "document": "Payment",
+    "title": "Payment - 2. Payment Security and Encryption",
+    "chunk_index": 2,
+    "content": "## 2. Payment Security and Encryption\n- All transactions are processed through PCI-DSS Level 1 compliant payment gateways.\n- We never store customer CVVs, credit/debit card numbers, or banking PINs on our servers.\n- Two-Factor Authentication (2FA / OTP) is mandatory for all card transactions."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "payment.md",
+    "document": "Payment",
+    "title": "Payment - 3. Failed or Pending Payments",
+    "chunk_index": 3,
+    "content": "## 3. Failed or Pending Payments\n- In the event of a transaction failure where money was debited from your bank account but no order confirmation was generated:\n  - The payment gateway will automatically initiate a refund within **24 hours**.\n  - Banks typically take **2 to 5 business days** to credit the amount back to your account.\n  - If the amount is not reversed after 5 business days, please share the transaction reference ID (UTR number) with our customer support team for manual reconciliation."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "return_refund.md",
+    "document": "Return Refund",
+    "title": "Return Refund - Return and Refund Policy",
+    "chunk_index": 0,
+    "content": "# Return and Refund Policy"
+  },
+  {
+    "source_type": "policy",
+    "source_file": "return_refund.md",
+    "document": "Return Refund",
+    "title": "Return Refund - 1. Return Window and Eligibility",
+    "chunk_index": 1,
+    "content": "## 1. Return Window and Eligibility\n- Customers can return products within **7 days** of delivery for eligible items.\n- To be eligible for a return, items must be in their original, unused condition, with all original tags, user manuals, warranty cards, and intact packaging.\n- Electronics (Smartphones, Laptops, Keyboards, Audio Devices) must be factory reset with all personal accounts removed.\n- Defective, damaged, or incorrect items received must be reported within **48 hours** of delivery with unboxing photos or video evidence."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "return_refund.md",
+    "document": "Return Refund",
+    "title": "Return Refund - 2. Non-Returnable Items",
+    "chunk_index": 2,
+    "content": "## 2. Non-Returnable Items\nThe following items cannot be returned unless received in a damaged or defective condition:\n- Opened software, digital codes, or downloadable products.\n- Consumable items where the hygienic seal has been broken (e.g., in-ear earbuds ear-tips, cleaning cloths).\n- Products marked as \"Final Sale\" or \"Clearance\".\n- Items returned without serial numbers, original invoice, or with damaged manufacturer barcodes."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "return_refund.md",
+    "document": "Return Refund",
+    "title": "Return Refund - 3. Return Process",
+    "chunk_index": 3,
+    "content": "## 3. Return Process\n1. Navigate to **My Orders** in your account dashboard and click **Request Return**.\n2. Select the reason for return and upload supporting photographs if the product is damaged or defective.\n3. Our courier partner will schedule a doorstep quality check and pickup within **2 to 3 business days**.\n4. Once the returned item reaches our fulfillment center and passes inspection (1-2 days), the refund will be triggered immediately."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "return_refund.md",
+    "document": "Return Refund",
+    "title": "Return Refund - 4. Refund Methods and Timelines",
+    "chunk_index": 4,
+    "content": "## 4. Refund Methods and Timelines\nRefunds will be processed back to the original payment method according to the following schedule:\n- **UPI (Google Pay, PhonePe, Paytm)**: 24 to 48 hours after return verification.\n- **Credit / Debit Cards**: 3 to 7 business days depending on the issuing bank.\n- **Net Banking**: 3 to 5 business days.\n- **Cash on Delivery (COD)**: Refund will be credited via NEFT / IMPS bank transfer or instant Store Wallet Credit within 2 business days after the customer provides their bank details.\n- **Shipping Fees**: Standard shipping fees are non-refundable unless the return is due to a merchant error (defective or wrong item delivered)."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "warranty.md",
+    "document": "Warranty",
+    "title": "Warranty - Product Warranty Policy",
+    "chunk_index": 0,
+    "content": "# Product Warranty Policy"
+  },
+  {
+    "source_type": "policy",
+    "source_file": "warranty.md",
+    "document": "Warranty",
+    "title": "Warranty - 1. Standard Brand Warranty",
+    "chunk_index": 1,
+    "content": "## 1. Standard Brand Warranty\n- All electronic products (Smartphones, Laptops, Keyboards, Audio Devices, Smart Watches, PC Peripherals) sold on our platform carry a minimum **1-Year Manufacturer Brand Warranty** from the date of invoice.\n- Selected premium components and backpacks carry extended manufacturer warranties:\n  - Backpacks and Travel Gear: **2-Year Limited Stitch & Zipper Warranty**.\n  - Laptop mechanical switches / keyboard switches: **1-Year Limited Replacement Guarantee**."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "warranty.md",
+    "document": "Warranty",
+    "title": "Warranty - 2. What Is Covered Under Warranty?",
+    "chunk_index": 2,
+    "content": "## 2. What Is Covered Under Warranty?\n- Manufacturing defects in materials and craftsmanship.\n- Hardware failure under normal recommended operating conditions.\n- Sensor, battery, or motherboard malfunctions not caused by external trauma or abuse.\n- Dead-on-arrival (DOA) units reported within 48 hours of initial delivery."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "warranty.md",
+    "document": "Warranty",
+    "title": "Warranty - 3. What Is Excluded From Warranty?",
+    "chunk_index": 3,
+    "content": "## 3. What Is Excluded From Warranty?\n- Physical damage, drops, cracks, dents, and accidental liquid/water immersion (unless certified IP rating explicitly covers it).\n- Wear and tear resulting from routine daily usage (scratches on display, fabric fraying, normal cosmetic wear).\n- Unauthorized disassembly, modifications, unofficial firmware flashing, or repairs conducted by third-party technicians.\n- Damage caused by electrical surges, faulty wall sockets, or non-certified third-party charging cables."
+  },
+  {
+    "source_type": "policy",
+    "source_file": "warranty.md",
+    "document": "Warranty",
+    "title": "Warranty - 4. How to Claim Warranty",
+    "chunk_index": 4,
+    "content": "## 4. How to Claim Warranty\n1. Locate your tax invoice in your account under **My Orders > Download Invoice**.\n2. Visit any authorized manufacturer brand service center across India with the original invoice and product serial number.\n3. Alternatively, contact our dedicated warranty desk at `warranty@shopease.com` or call `1800-123-4567` for doorstep warranty pickup in select metro cities."
+  }
+]
