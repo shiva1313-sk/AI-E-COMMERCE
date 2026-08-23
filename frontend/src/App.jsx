@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Header from './components/Header';
 import CategoryNav from './components/CategoryNav';
-import HeroBanner from './components/HeroBanner';
 import ProductCard from './components/ProductCard';
 import ProductDetails from './components/ProductDetails';
 import CartDrawer from './components/CartDrawer';
@@ -133,17 +132,6 @@ function MainAppContent() {
         activeCategory={activeCategory}
         onSelectCategory={handleSelectCategory}
       />
-
-      {/* Hero Deals & AI Search Spotlight Banner */}
-      {!searchQuery && (
-        <HeroBanner
-          onSearchTag={(tag) => {
-            handleHeaderSearch(tag);
-            setIsChatbotOpen(true);
-          }}
-          onOpenChatbot={() => setIsChatbotOpen(true)}
-        />
-      )}
 
       {/* Main E-Commerce Product Catalog */}
       <main className="dashboard-main">
