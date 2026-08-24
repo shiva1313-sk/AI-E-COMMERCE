@@ -1,7 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/+$/, '');
 
 class ApiService {
-  async _request(endpoint, options = {}, timeoutMs = 4000) {
+  async _request(endpoint, options = {}, timeoutMs = 15000) {
     const url = `${API_BASE_URL}${endpoint}`;
     const defaultHeaders = {
       'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ class ApiService {
   }
 
   async checkHealth() {
-    return this._request('/api/health', {}, 3000);
+    return this._request('/api/health', {}, 10000);
   }
 
   async sendChatMessage(message, conversationId = null, orders = []) {
@@ -57,7 +57,7 @@ class ApiService {
         conversation_id: conversationId,
         orders: orders || []
       })
-    }, 5000);
+    }, 35000);
   }
 
   async getRecommendations(query, category = null, maxPrice = null, topK = 4) {
@@ -69,7 +69,7 @@ class ApiService {
         max_price: maxPrice,
         top_k: topK
       })
-    }, 4000);
+    }, 15000);
   }
 
   async queryKnowledge(query, topK = 3) {
@@ -79,7 +79,7 @@ class ApiService {
         query,
         top_k: topK
       })
-    }, 4000);
+    }, 15000);
   }
 
   async getProducts(filters = {}) {
@@ -91,11 +91,11 @@ class ApiService {
     if (filters.search) params.append('search', filters.search);
 
     const queryStr = params.toString() ? `?${params.toString()}` : '';
-    return this._request(`/api/products${queryStr}`, {}, 3500);
+    return this._request(`/api/products${queryStr}`, {}, 15000);
   }
 
   async getProductById(productId) {
-    return this._request(`/api/products/${productId}`, {}, 3500);
+    return this._request(`/api/products/${productId}`, {}, 15000);
   }
 }
 

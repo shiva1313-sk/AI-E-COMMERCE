@@ -54,6 +54,14 @@ async def lifespan(app: FastAPI):
 
     # 2. Load FAISS indices
     vector_store_service.load_all_indices()
+    if not vector_store_service.is_index_ready("products") or not vector_store_service.is_index_ready("knowledge"):
+        try:
+            logger.info("Indices not detected on disk, running auto-ingestion...")
+            from backend.scripts.ingest import run_ingestion
+            run_ingestion()
+            vector_store_service.load_all_indices()
+        except Exception as e:
+            logger.error(f"Auto-ingestion during lifespan error: {e}")
 
     yield
 
@@ -73,15 +81,27 @@ app = FastAPI(
 app.add_exception_handler(AIShoppingAssistantException, app_exception_handler)  # type: ignore
 app.add_exception_handler(Exception, generic_exception_handler)
 
-# CORS middleware
+# CORS middleware - Production-ready configuration
 origins = get_cors_origins()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins if origins else ["*"],
-    allow_credentials=True,
+    allow_origins=["*"] if ("*" in origins or not origins) else origins,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/", tags=["Root"])
+async def root():
+    """Root entrypoint confirming backend API is online."""
+    return {
+        "status": "online",
+        "service": "ShopEase AI Shopping Guide API",
+        "version": "1.0.0",
+        "health": "/api/health",
+        "docs": "/docs"
+    }
 
 
 @app.get("/api/health", tags=["Health"])
